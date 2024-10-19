@@ -6,26 +6,18 @@ from omegaconf import DictConfig
 from uvicorn.config import LoopSetupType
 
 from .llm_engines import (
-    HFEngine,
-    HFSamplingParams,
-    LlamaCppEngine,
-    LlamaCppSamplingParams,
     VLLMEngine,
     VLLMSamplingParams,
 )
 
-ENGINE_MAP: Dict[str, Type[Union[HFEngine, VLLMEngine, LlamaCppEngine]]] = {
-    "HFEngine": HFEngine,
+ENGINE_MAP: Dict[str, Type[VLLMEngine]] = {
     "VLLMEngine": VLLMEngine,
-    "LlamaCppEngine": LlamaCppEngine,
 }
 
 ENGINE_SAMPLING_PARAMS_MAP: Dict[
-    str, Type[Union[HFSamplingParams, VLLMSamplingParams, LlamaCppSamplingParams]]
+    str, Type[VLLMSamplingParams]
 ] = {
-    "HFEngine": HFSamplingParams,
-    "VLLMEngine": VLLMSamplingParams,
-    "LlamaCppEngine": LlamaCppSamplingParams,
+    "VLLMEngine": VLLMSamplingParams
 }
 
 
