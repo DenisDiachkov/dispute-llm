@@ -17,14 +17,14 @@ docker build -f dockerfile.prod -t dispute_llm .
 ### Run
 docker compose up
 
-### Inference
-#### GUI
+## Inference
+### GUI
 Access GUI by 127.0.0.1:8000
 ![image](docs/gui.png)
-#### HTTP Request
-##### Endpoint
+### HTTP Request
+#### Endpoint
 GET 127.0.0.1:8000/generate
-##### Parameters
+#### Parameters
 prompt: str
 system_prompt: str
 reply_prefix: str
@@ -35,14 +35,14 @@ top_p: float
 repetition_penalty: float
 frequency_penalty: float
 presence_penalty: float
-##### Response
+#### Response
 The server will respond with a JSON object containing:
 
 status: str - "error" or "finished"
 content: str - LLMs response
 
-#### WebSocket
-##### Send parameters
+### WebSocket
+#### Send parameters
 prompt: str
 system_prompt: str
 reply_prefix: str
@@ -53,7 +53,7 @@ top_p: float
 repetition_penalty: float
 frequency_penalty: float
 presence_penalty: float
-##### Receive JSON
+#### Receive JSON
 The server will send a JSON object containing:
 
 status: str - "error" or "finished"
