@@ -1,14 +1,13 @@
-FROM python:3.11-slim
+FROM ubuntu:22.04
 
+WORKDIR /code
+COPY . /code
+COPY config /code/config
 
-COPY dist /dist
-
-RUN mkdir -p /root/pip
-RUN --mount=type=secret,id=PIP_INDEX_EXTRA_URL,target=/PIP_INDEX_EXTRA_URL \
+RUN apt-get update && \
+    apt-get install build-essential && \
     python -m pip install --upgrade pip && \
-    python -m pip install /dist/*.whl --no-cache-dir \
-    --extra-index-url $(cat /PIP_INDEX_EXTRA_URL) \
-    --trusted-host $(cat /PIP_INDEX_EXTRA_URL  | awk -F/ '{print $3}' | awk -F@ '{print $2}')
+    python -m pip install -e . && \ 
+RUN huggingface-cli download unsloth/Llama-3.2-11B-Vision-Instruct
 
-RUN echo $(ls /dist/*.whl | sed 's/.*\///' | sed 's/-.*//') > /PACKAGE_NAME
-ENTRYPOINT  python -m $(cat /PACKAGE_NAME)
+ENTRYPOINT  python -m AGISwarm.llm_instruct_ms --config-name config/config.yaml
