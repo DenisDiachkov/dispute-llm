@@ -6,25 +6,31 @@
 https://docs.docker.com/engine/install/ubuntu/
 
 ### Clone repo
-```
+```bash
 git clone https://github.com/DenisDiachkov/dispute-llm
 cd dispute-llm
 ```
 
 ### Build 
+```bash
 docker build -f dockerfile.prod -t dispute_llm .
+```
 
 ### Run
+```bash
 docker compose up
+```
 
 ## Inference
 ### GUI
-Access GUI by 127.0.0.1:8000
+Access GUI by ```127.0.0.1:8000```
+
 ![image](docs/gui.png)
 ### HTTP Request
 #### Endpoint
 GET 127.0.0.1:8000/generate
 #### Parameters
+```
 prompt: str
 system_prompt: str
 reply_prefix: str
@@ -35,14 +41,17 @@ top_p: float
 repetition_penalty: float
 frequency_penalty: float
 presence_penalty: float
+```
 #### Response
 The server will respond with a JSON object containing:
-
+```python
 status: str - "error" or "finished"
 content: str - LLMs response
+```
 
 ### WebSocket
 #### Send parameters
+```python
 prompt: str
 system_prompt: str
 reply_prefix: str
@@ -53,9 +62,11 @@ top_p: float
 repetition_penalty: float
 frequency_penalty: float
 presence_penalty: float
+```
 #### Receive JSON
 The server will send a JSON object containing:
-
+```python
 status: str - "error" or "finished"
 content: str - LLMs streaming response
-**other_stuff, depending on the status. See more here:  [asyncio_queue_manager](https://github.com/AGISwarm/asyncio-queue-manager/blob/dev/src/AGISwarm/asyncio_queue_manager/core.py)
+```
+Can contain also other entries, depending on the status. See more here:  [asyncio_queue_manager](https://github.com/AGISwarm/asyncio-queue-manager/blob/dev/src/AGISwarm/asyncio_queue_manager/core.py)
