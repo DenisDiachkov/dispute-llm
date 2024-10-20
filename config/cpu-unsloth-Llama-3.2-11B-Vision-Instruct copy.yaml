@@ -1,0 +1,19 @@
+%YAML 1.1
+---
+
+hf_model_name: !!str "unsloth/Llama-3.2-11B-Vision-Instruct"
+tokenizer_name: !!str "unsloth/Llama-3.2-11B-Vision-Instruct"
+
+engine: !!str VLLMEngine
+engine_config:
+  device: !!str cpu
+  dtype: !!str bfloat16
+  max_model_len: 8192
+  enforce_eager: True
+  max_num_seqs: 2
+  limit_mm_per_prompt: {"image": 1}
+
+
+defaults:
+  - gui_config: default
+  - uvicorn_config: default

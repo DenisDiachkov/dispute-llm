@@ -42,7 +42,7 @@ class LLMInstructApp:  # pylint: disable=too-few-public-methods
         )
         self.sampling_settings_cls = ENGINE_SAMPLING_PARAMS_MAP[config.engine]
         self.queue_manager = AsyncIOQueueManager(
-            max_concurrent_tasks=2,
+            max_concurrent_tasks=1,
             sleep_time=0.001,
         )
         self.start_abort_lock = asyncio.Lock()
