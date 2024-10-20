@@ -2,21 +2,18 @@
 
 ## Installation
 
-### Install docker
+1. Install docker
 https://docs.docker.com/engine/install/ubuntu/
-
-### Clone repo
+2. Clone repo
 ```bash
 git clone https://github.com/DenisDiachkov/dispute-llm
 cd dispute-llm
 ```
-
-### Build 
+3. Build 
 ```bash
 docker build -f dockerfile.prod -t dispute_llm .
 ```
-
-### Run
+4. Run
 ```bash
 docker compose up
 ```
