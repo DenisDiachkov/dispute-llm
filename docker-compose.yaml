@@ -5,7 +5,7 @@ services:
     network_mode: "host"
     image: dispute_llm
     volumes:
-      - /root/dispute-llm/config/cpu-unsloth-Llama-3.2-11B-Vision-Instruct copy.yaml:/code/config/config.yaml
+      - ./config/config.yaml:/code/config/config.yaml
     ports:
       - "8000:8000"  # Adjust this port mapping as needed
     environment:
