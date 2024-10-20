@@ -57,13 +57,13 @@
             </div>
             <div class="form-group">
                 <span for="top_p">Top P:</span>
-                <input type="number" id="top_p" class="form-control" min="1e-9" max="1.0" step="0.1" value="0.95">
+                <input type="number" id="top_p" class="form-control" min="1e-9" max="1.0" step="0.1" value="0.9">
 
             </div>
             <div class="form-group">
                 <span for="repetition_penalty">Repetition Penalty:</span>
                 <input type="number" id="repetition_penalty" class="form-control" min="1e-9" max="2.0" step="0.1"
-                    value="1.2">
+                    value="1.0">
 
             </div>
             <div class="form-group">
@@ -84,8 +84,8 @@
     <script>
         const DEFAULT_MAX_NEW_TOKENS = "1000";
         const DEFAULT_TEMPERATURE = "0.6";
-        const DEFAULT_TOP_P = "0.95";
-        const DEFAULT_REPETITION_PENALTY = "1.2";
+        const DEFAULT_TOP_P = "0.9";
+        const DEFAULT_REPETITION_PENALTY = "1.0";
         const DEFAULT_FREQUENCY_PENALTY = "0.0";
         const DEFAULT_PRESENCE_PENALTY = "0.0";
         const DEFAULT_SYSTEM_PROMPT = "";

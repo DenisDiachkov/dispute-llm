@@ -59,7 +59,8 @@ class LLMInstructApp:  # pylint: disable=too-few-public-methods
             name="static",
         )
         self.ws_router = APIRouter()
-        self.ws_router.add_websocket_route("/ws", self.generate)
+        self.ws_router.add_websocket_route("/ws", self.generate_ws)
+        self.app.get("/generate")(self.generate_http)
         self.app.post("/abort")(self.abort)
         self.app.include_router(self.ws_router)
 
@@ -105,7 +106,7 @@ class LLMInstructApp:  # pylint: disable=too-few-public-methods
         image = self.remove_mime_header(image)
         return Image.open(BytesIO(base64.b64decode(image))).convert("RGB")
 
-    async def generate(self, websocket: WebSocket):  # type: ignore
+    async def generate_ws(self, websocket: WebSocket):  # type: ignore
         """WebSocket endpoint"""
         await websocket.accept()
         conversation_id = str(uuid.uuid4())
@@ -151,6 +152,70 @@ class LLMInstructApp:  # pylint: disable=too-few-public-methods
         finally:
             self.llm_pipeline.conversations.pop(conversation_id, None)
             await websocket.close()
+
+    # pylint: disable=too-many-instance-attributes
+    class HTTPGenRequest(BaseModel):
+        """
+        Request model for HTTP generation
+        """
+
+        prompt: str
+        system_prompt: str
+        reply_prefix: str
+        image: str
+        max_new_tokens: int
+        temperature: float
+        top_p: float
+        repetition_penalty: float
+        frequency_penalty: float
+        presence_penalty: float
+
+    async def generate_http(self, http_gen_request: HTTPGenRequest):
+        """Docstring"""
+        data = http_gen_request.model_dump()
+        gen_config = SamplingConfig(data)
+        conversation_id = str(uuid.uuid4())
+        sampling_dict = self.sampling_settings_cls.model_validate(
+            gen_config,
+            strict=False,
+        )
+        image: Image.Image | None = (
+            self.base64_to_image(gen_config.image) if gen_config.image else None
+        )
+        # Enqueue the task (without starting it)
+        queued_task = self.queue_manager.queued_task(
+            self.llm_pipeline.__call__,
+            pass_task_id=isinstance(
+                self.llm_pipeline, ConcurrentEngine  # type: ignore
+            ),
+            warnings=(
+                ["Image input not supported by this model"]
+                if image and not self.llm_pipeline.image_prompt_enabled
+                else None
+            ),
+            raise_on_error=False,
+            print_error_tracebacks=True,
+        )
+        content = ""
+        # task_id and interrupt_event are created by the queued_generator
+        async for step_info in queued_task(
+            conversation_id,
+            gen_config.prompt,
+            gen_config.system_prompt,
+            gen_config.reply_prefix,
+            image,
+            sampling_dict,
+        ):
+            if step_info["status"] == TaskStatus.ERROR:
+                return {
+                    "status": TaskStatus.ERROR,
+                    "content": content,
+                    "error": step_info["content"],
+                }
+            elif step_info["status"] == TaskStatus.RUNNING:
+                content += step_info["content"]
+
+        return {"status": TaskStatus.FINISHED, "content": content}
 
     class AbortRequest(BaseModel):
         """Abort request"""
