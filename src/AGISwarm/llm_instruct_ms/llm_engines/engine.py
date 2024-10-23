@@ -33,21 +33,21 @@ class PreparePromptMixin:
         chat_template: Optional[str] = None,
     ):
         """Prepare prompt for model"""
-        # eot_uuid = "eot_" + str(uuid.uuid4())
+        eot_uuid = "eot_" + str(uuid.uuid4())
         prompt = (
             cast(
                 str,
                 tokenizer.apply_chat_template(
                     messages,
                     tokenize=False,
-                    add_generation_prompt=True,
+                    add_generation_prompt=False,
                     chat_template=chat_template or cast(str, tokenizer.chat_template),
                 ),
-            )  # .rstrip()
-            # + eot_uuid
+            ).rstrip()
+            + eot_uuid
         )
-        # prompt = prompt.replace(tokenizer.eos_token + eot_uuid, "")
-        # prompt = prompt.replace(eot_uuid, "")
+        prompt = prompt.replace(tokenizer.eos_token + eot_uuid, "")
+        prompt = prompt.replace(eot_uuid, "\n")
         print(prompt)
         return prompt
 
@@ -71,7 +71,7 @@ class Engine(Generic[_SamplingParams_contra], PreparePromptMixin):
         sampling_params: _SamplingParams_contra,
     ) -> AsyncGenerator[str, None]:
         if image:
-            prompt = "<|image|>\n" + prompt if image else prompt
+            prompt = prompt if image else prompt
             self.image[conversation_id] = image
         if conversation_id not in self.conversations:
             self.conversations[conversation_id] = []
@@ -148,9 +148,9 @@ class ConcurrentEngine(Generic[_SamplingParams_contra], PreparePromptMixin):
                 }
             )
         self.conversations[conversation_id].append({"role": "user", "content": prompt})
-        # self.conversations[conversation_id].append(
-        #     {"role": "assistant", "content": reply_prefix}
-        # )
+        self.conversations[conversation_id].append(
+            {"role": "assistant", "content": reply_prefix}
+        )
         try:
             async for response in self.generate(
                 self.conversations[conversation_id],
